@@ -9,11 +9,16 @@
 /* ====================================================================
    1. DESIGN TOKENS
    ==================================================================== */
+@font-face {
+    font-family: "Riuka";
+    src: url("fonts/Riuka.woff2") format("woff2");
+    font-display: swap;
+}
 :root{
   /* --- FONT ---
      Per i font custom: cambia queste due variabili.
      Se usi @font-face, dichiaralo FUORI da :root (vedi sotto). */
-  --font-display: 'Fraunces', Georgia, serif;
+  --font-display: "Riuka", 'Fraunces', Georgia, serif;
   --font-body:    'Fraunces', Georgia, serif;
 
   /* --- COLORI --- */
