@@ -143,8 +143,8 @@ const CAT_ORDER = ['agricoltori','macellai','pescivendoli','panifici','ristorato
    --------------------------------------------------------------------
    Struttura di un luogo:
    { id, category, name, lat, lng, image, description{it,en},
-     address, hours{it,en}, addedBy, addedAgo, rating,
-     comments:[ { author, ago, sentiment:'pos'|'neg', text{it,en} } ] }
+     address, hours{it,en}, addedAgo, rating,
+     comments:[ { author, ago, text:{ it:{pos,neg}, en:{pos,neg} } } ] }
    ==================================================================== */
 let PLACES = [
   {
@@ -155,19 +155,16 @@ let PLACES = [
       en:'Discover everything hidden in the Lecco countryside: fruit, vegetables and many other local specialities.'},
     address:'Piazza San Michele, 35A',
     hours:{it:'Mar–Sab 7:00–13:00', en:'Tue–Sat 7:00–13:00'},
-    addedBy:'Tourist from Paris', addedAgo:5, rating:19,
+    addedAgo:5, rating:19,
     comments:[
-      {author:'Jenny K.', ago:5, sentiment:'pos',
-       text:{
-         it:{
-           pos:'Molto vivace, ho trovato ogni tipo di prodotto locale. Freschissimo!',
-           neg:'I venditori non parlavano inglese, ma ci siamo capiti lo stesso.'
-         },
-         en:{
-           pos:'Very bustling, I could find every kind of local product! So fresh!',
-           neg:'The vendors didn\u2019t speak english, but we found a way to have us understood.'
-         }
-       }},
+      { author:'Jenny K.', ago:5,
+        text:{
+          it:{ pos:'Molto vivace, ho trovato ogni tipo di prodotto locale. Freschissimo!',
+               neg:'I venditori non parlavano inglese, ma ci siamo capiti lo stesso.' },
+          en:{ pos:'Very bustling, I could find every kind of local product! So fresh!',
+               neg:'The vendors didn\'t speak English, but we found a way to be understood.' }
+        }
+      }
     ]
   },
   {
@@ -177,7 +174,17 @@ let PLACES = [
                  en:'Selected meats from mountain farms of the Lecco area.'},
     address:'Via Bovara, 12',
     hours:{it:'Lun–Sab 8:00–19:30', en:'Mon–Sat 8:00–19:30'},
-    addedBy:'Luca R.', addedAgo:12, rating:8, comments:[]
+    addedAgo:12, rating:8,
+    comments:[
+      { author:'Luca R.', ago:10,
+        text:{
+          it:{ pos:'Carne eccellente, si sente la qualità. Il salame di capra è unico.',
+               neg:'Prezzi un po\' alti rispetto alla media, ma la qualità giustifica.' },
+          en:{ pos:'Excellent meat, you can taste the quality. The goat salami is unique.',
+               neg:'Prices a bit higher than average, but quality justifies it.' }
+        }
+      }
+    ]
   },
   {
     id:3, category:'ristoratori', name:'Trattoria del Lago',
@@ -186,7 +193,17 @@ let PLACES = [
                  en:'Traditional Larian cuisine with a lake view: lake fish and typical dishes.'},
     address:'Lungolago Isonzo, 4',
     hours:{it:'Mar–Dom 12:00–14:30 / 19:00–22:30', en:'Tue–Sun 12:00–14:30 / 19:00–22:30'},
-    addedBy:'Sara M.', addedAgo:3, rating:24, comments:[]
+    addedAgo:3, rating:24,
+    comments:[
+      { author:'Sara M.', ago:3,
+        text:{
+          it:{ pos:'Vista stupenda e risotto con pesce persico perfetto. Atmosfera autentica.',
+               neg:'Attesa un po\' lunga nel weekend, meglio prenotare.' },
+          en:{ pos:'Stunning view and perfect perch risotto. Authentic atmosphere.',
+               neg:'Quite a wait on weekends, better to book ahead.' }
+        }
+      }
+    ]
   },
   {
     id:4, category:'pescivendoli', name:'Pescatori del Lario',
@@ -195,7 +212,17 @@ let PLACES = [
                  en:'Fresh lake fish, caught every morning by the Lario fishermen.'},
     address:'Via Nullo, 7',
     hours:{it:'Mar–Sab 8:00–12:30', en:'Tue–Sat 8:00–12:30'},
-    addedBy:'Giovanni P.', addedAgo:8, rating:15, comments:[]
+    addedAgo:8, rating:15,
+    comments:[
+      { author:'Giovanni P.', ago:7,
+        text:{
+          it:{ pos:'Pesce freschissimo, il miglior lavarello che abbia mai mangiato.',
+               neg:'Orari di apertura limitati, bisogna andarci presto la mattina.' },
+          en:{ pos:'Incredibly fresh fish, the best whitefish I\'ve ever had.',
+               neg:'Limited opening hours, you need to go early in the morning.' }
+        }
+      }
+    ]
   },
   {
     id:5, category:'panifici', name:'Panificio Resegone',
@@ -204,7 +231,17 @@ let PLACES = [
                  en:'Naturally leavened bread and typical Lecco pastries baked every day.'},
     address:'Via Cavour, 21',
     hours:{it:'Lun–Sab 6:30–19:00', en:'Mon–Sat 6:30–19:00'},
-    addedBy:'Elena T.', addedAgo:20, rating:11, comments:[]
+    addedAgo:20, rating:11,
+    comments:[
+      { author:'Elena T.', ago:18,
+        text:{
+          it:{ pos:'Il pane di segale è spettacolare, crosta croccante e mollica morbida.',
+               neg:'Pochi posti a sedere, è più un forno da asporto.' },
+          en:{ pos:'The rye bread is spectacular, crispy crust and soft crumb.',
+               neg:'Very few seats, it\'s more of a takeaway bakery.' }
+        }
+      }
+    ]
   },
   {
     id:6, category:'panifici', name:'Forno Antico Caleotto',
@@ -213,7 +250,17 @@ let PLACES = [
                  en:'Historic bakery of the Caleotto district, dry pastry specialities.'},
     address:'Via alla Fonte, 3',
     hours:{it:'Lun–Sab 7:00–13:00 / 16:00–19:00', en:'Mon–Sat 7:00–13:00 / 16:00–19:00'},
-    addedBy:'Marco V.', addedAgo:15, rating:6, comments:[]
+    addedAgo:15, rating:6,
+    comments:[
+      { author:'Marco V.', ago:14,
+        text:{
+          it:{ pos:'I biscotti di meliga sono incredibili, ricetta tradizionale perfetta.',
+               neg:'Chiude presto il pomeriggio, non sempre facile passarci.' },
+          en:{ pos:'The meliga biscuits are incredible, perfect traditional recipe.',
+               neg:'Closes early in the afternoon, not always easy to catch it.' }
+        }
+      }
+    ]
   },
   {
     id:7, category:'agricoltori', name:'Orto di Castello',
@@ -222,7 +269,17 @@ let PLACES = [
                  en:'Small farm with direct sale of seasonal vegetables.'},
     address:'Via ai Poggi, 18',
     hours:{it:'Mer e Sab 9:00–18:00', en:'Wed & Sat 9:00–18:00'},
-    addedBy:'Anna B.', addedAgo:6, rating:13, comments:[]
+    addedAgo:6, rating:13,
+    comments:[
+      { author:'Anna B.', ago:5,
+        text:{
+          it:{ pos:'Verdure saporitissime, si vede che sono coltivate con cura. Prezzi onesti.',
+               neg:'Aperto solo due giorni a settimana, bisogna organizzarsi.' },
+          en:{ pos:'Very flavorful vegetables, you can tell they\'re grown with care. Fair prices.',
+               neg:'Only open two days a week, you need to plan ahead.' }
+        }
+      }
+    ]
   }
 ];
 
@@ -478,11 +535,11 @@ let currentPlace = null;
 function openInfoWindow(place){
   currentPlace = place;
   const cat = CATEGORIES[place.category];
-  const initials = place.addedBy.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
   const commentsHTML = place.comments.length
     ? place.comments.map(c => {
         const ci = c.author.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        const txt = c.text[LANG];
         return `<div class="comment">
           <div class="iw-av">${ci}</div>
           <div class="c-body">
@@ -490,11 +547,8 @@ function openInfoWindow(place){
               <span class="c-name">${c.author}</span>
               <span class="c-ago">${t('iw.daysAgo',{n:c.ago})}</span>
             </div>
-            <div class="c-text">
-              <span class="c-emo">${c.sentiment==='pos'?'🙂':'😕'}</span>
-              <div>${c.text[LANG].pos}</div>
-              <div style="color:var(--ink-soft); font-size:smaller;">${c.text[LANG].neg}</div>
-            </div>
+            ${txt.pos ? `<p class="c-review c-pos"><span class="c-emoji">🙂</span> ${txt.pos}</p>` : ''}
+            ${txt.neg ? `<p class="c-review c-neg"><span class="c-emoji">😕</span> ${txt.neg}</p>` : ''}
           </div></div>`;
       }).join('')
     : `<div style="font-size:13px;color:var(--ink-soft);padding:10px 0">—</div>`;
@@ -511,11 +565,7 @@ function openInfoWindow(place){
       <div class="iw-row"><span class="k">${t('iw.hours')}:</span><span>${place.hours[LANG]}</span></div>
     </div>
     <div class="iw-attrib">
-      <div class="iw-av">${initials}</div>
-      <div>
-        <div class="nm">${place.addedBy}</div>
-        <div class="ag">${t('iw.addedAgo',{n:place.addedAgo})}</div>
-      </div>
+      <div class="ag">${t('iw.addedAgo',{n:place.addedAgo})}</div>
       <div class="iw-rating">♥ ${place.rating}</div>
     </div>
     <div class="iw-section-t">${t('iw.community')}</div>
@@ -533,8 +583,8 @@ function openInfoWindow(place){
     const quick = $('#quickComment').value.trim();
     if (quick){
       // commento veloce inline
-      place.comments.push({author: LANG==='it'?'Tu':'You', ago:0, sentiment:'pos',
-        text:{it:quick,en:quick}});
+      place.comments.push({author: LANG==='it'?'Tu':'You', ago:0,
+        text:{it:{pos:quick,neg:''},en:{pos:quick,neg:''}}});
       openInfoWindow(place);                 // re-render
       openSheet('sheetInfo');
       showToast(t('toast.comment'));
@@ -642,7 +692,7 @@ $('#apSend').onclick = () => {
     description:{it:'Nuovo posto consigliato dalla community.',
                  en:'New place recommended by the community.'},
     address:addr, hours:{it:'Da confermare',en:'To be confirmed'},
-    addedBy: LANG==='it'?'Tu':'You', addedAgo:0, rating:0, comments:[]
+    addedAgo:0, rating:0, comments:[]
   };
   PLACES.push(np);
   MapEngine.refresh();
@@ -659,8 +709,10 @@ $('#rvSend').onclick = () => {
   const improve = $('#rvImprove').value.trim();
   if (!liked && !improve){ showToast(LANG==='it'?'Scrivi una recensione':'Write a review'); return; }
   if (currentPlace){
-    if (liked)   currentPlace.comments.push({author:name,ago:0,sentiment:'pos',text:{it:liked,en:liked}});
-    if (improve) currentPlace.comments.push({author:name,ago:0,sentiment:'neg',text:{it:improve,en:improve}});
+    currentPlace.comments.push({
+      author:name, ago:0,
+      text:{ it:{pos:liked,neg:improve}, en:{pos:liked,neg:improve} }
+    });
     if (rvRating) currentPlace.rating += rvRating;
     openInfoWindow(currentPlace);
   }
