@@ -9,16 +9,11 @@
 /* ====================================================================
    1. DESIGN TOKENS
    ==================================================================== */
-@font-face {
-    font-family: "Riuka";
-    src: url("fonts/Riuka.woff2") format("woff2");
-    font-display: swap;
-}
 :root{
   /* --- FONT ---
      Per i font custom: cambia queste due variabili.
      Se usi @font-face, dichiaralo FUORI da :root (vedi sotto). */
-  --font-display: "Riuka", 'Fraunces', Georgia, serif;
+  --font-display: 'Fraunces', Georgia, serif;
   --font-body:    'Fraunces', Georgia, serif;
 
   /* --- COLORI --- */
@@ -599,19 +594,16 @@ ul{list-style:none;}
 .comment .c-head{display:flex;justify-content:space-between;align-items:baseline;}
 .comment .c-name{font-size:clamp(11px,3.2vw,13px);font-weight:700;color:var(--ink);}
 .comment .c-ago{font-size:clamp(9px,2.6vw,11px);color:var(--ink-soft);}
-.comment .c-review{
-  margin:6px 0 0;
-  font-size:clamp(11.5px,3.3vw,13.5px);
-  line-height:1.55;
-  color:var(--ink);
+.comment .c-text{
+  margin-top:6px;
+  font-size:clamp(11px,3.2vw,13px);
+  line-height:1.5;color:var(--ink);
+  display:flex;flex-direction:column;gap:8px;
 }
-.comment .c-review .c-emoji{
-  margin-right:4px;
-  font-size:clamp(13px,3.5vw,15px);
-}
-.comment .c-neg{
-  color:var(--ink-soft);
-}
+.c-line{display:flex;gap:8px;align-items:flex-start;}
+.c-line .c-emo{flex:0 0 auto;font-size:clamp(14px,3.8vw,16px);line-height:1.4;}
+.c-line span:last-child{flex:1;}
+.c-line.c-neg{color:var(--ink);opacity:.75;}
 .add-comment{
   margin-top:clamp(12px,4vw,18px);
   display:flex;align-items:center;gap:8px;

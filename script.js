@@ -8,7 +8,7 @@ const ASSETS = {
     cow:    "images/icons/cow.png",
     fish:   "images/icons/fish.png",
     croissant: "images/icons/croissant.png",
-    cutlery:   "images/icons/posate.png"
+    cutlery:   "images/icons/posateIcon.png"
   },
   
   // Logo e sfondo
