@@ -207,12 +207,12 @@ let PLACES = [
     ]
   },
   {
-    id:3, category:'macellai', name:'Leccolatte',
-    lat:45.90453849119619, lng:9.42800958189779, image:null, /*45.90453849119619, 9.42800958189779*/
+    id:3, category:'pescivendoli', name:'Da Ceko Il Pescatore',
+    lat:45.84403722665931, lng:9.399037695388786, image:null, /*45.84403722665931, 9.399037695388786*/
     description:{it:'Cucina tradizionale lariana con vista sul lago: pesce di lago e piatti tipici.',
                  en:'Traditional Larian cuisine with a lake view: lake fish and typical dishes.'},
-    address:'Lungolago Isonzo, 4',
-    hours:{it:'Mar–Dom 12:00–14:30 / 19:00–22:30', en:'Tue–Sun 12:00–14:30 / 19:00–22:30'},
+    address:'Piazza Era 8, 23900 Lecco (LC)',
+    hours:{it:'Gio 10:30–22:30  Dom 10:30–14:30', en:'Thu 10:30–22:30 Sat 10:30–14:30'},
     addedAgo:3, rating:24,
     comments:[
       { author:'Sara M.', ago:3,
@@ -226,11 +226,11 @@ let PLACES = [
     ]
   },
   {
-    id:4, category:'pescivendoli', name:'Pescatori del Lario',
-    lat:45.8540, lng:9.3935, image:null,
-    description:{it:'Pesce fresco di lago, pescato ogni mattina dai pescatori del Lario.',
-                 en:'Fresh lake fish, caught every morning by the Lario fishermen.'},
-    address:'Via Nullo, 7',
+    id:4, category:'ristoratori', name:'Taverna ai Poggi',
+    lat:45.85966786273042, lng:9.411567354908135, image:null, /*45.85966786273042, 9.411567354908135*/
+    description:{it:'ristorante e pizzeria con cucina italiana tradizionale e terrazza panoramica.',
+                 en:'Traditional Italian restaurant and pizzeria with a panoramic terrace.'},
+    address:'Via ai Poggi 14/20, 23900 Lecco (LC)',
     hours:{it:'Mar–Sab 8:00–12:30', en:'Tue–Sat 8:00–12:30'},
     addedAgo:8, rating:15,
     comments:[
@@ -245,11 +245,11 @@ let PLACES = [
     ]
   },
   {
-    id:5, category:'panifici', name:'Panificio Resegone',
-    lat:45.8575, lng:9.3990, image:null,
-    description:{it:'Pane a lievitazione naturale e dolci tipici lecchesi sfornati ogni giorno.',
-                 en:'Naturally leavened bread and typical Lecco pastries baked every day.'},
-    address:'Via Cavour, 21',
+    id:5, category:'agricoltori', name:'Il Fruttorto Di Fumagalli Marco E C. Snc',
+    lat:45.85422732090137, lng:9.394485627920242, image:null, /*45.85422732090137, 9.394485627920242*/
+    description:{it:'negozio di frutta e verdura con prodotti agricoli locali e stagionali.',
+                 en:'Fruit and vegetable shop offering local and seasonal agricultural produce.'},
+    address:'Via Marco d’Oggiono 6, 23900 Lecco (LC)',
     hours:{it:'Lun–Sab 6:30–19:00', en:'Mon–Sat 6:30–19:00'},
     addedAgo:20, rating:11,
     comments:[
@@ -264,11 +264,11 @@ let PLACES = [
     ]
   },
   {
-    id:6, category:'panifici', name:'Forno Antico Caleotto',
-    lat:45.8528, lng:9.3995, image:null,
-    description:{it:'Forno storico del quartiere Caleotto, specialità di pasticceria secca.',
-                 en:'Historic bakery of the Caleotto district, dry pastry specialities.'},
-    address:'Via alla Fonte, 3',
+    id:6, category:'macellai', name:'Colombo Carni Di Colombo Walter',
+    lat:45.85488627429565, lng: 9.391058341414105, image:null, /*45.85488627429565, 9.391058341414105*/
+    description:{it:'macelleria tradizionale specializzata in carni selezionate.',
+                 en:'Traditional butcher shop specializing in selected high-quality meats.'},
+    address:'Via Don Antonio Mascari 74, 23900 Lecco (LC)',
     hours:{it:'Lun–Sab 7:00–13:00 / 16:00–19:00', en:'Mon–Sat 7:00–13:00 / 16:00–19:00'},
     addedAgo:15, rating:6,
     comments:[
@@ -283,11 +283,11 @@ let PLACES = [
     ]
   },
   {
-    id:7, category:'agricoltori', name:'Orto di Castello',
-    lat:45.8602, lng:9.3970, image:null,
-    description:{it:'Piccola azienda agricola con vendita diretta di verdure di stagione.',
-                 en:'Small farm with direct sale of seasonal vegetables.'},
-    address:'Via ai Poggi, 18',
+    id:7, category:'panifici', name:'Ronchetti Giovanni & C.(S.N.C.)',
+    lat:45.81613836402201, lng:9.377249283209123, image:null, /*45.81613836402201, 9.377249283209123*/
+    description:{it:'panificio e pasticceria artigianale storica di Galbiate.',
+                 en:'Historic artisan bakery and pastry shop.'},
+    address:'Piazza Alessandro Manzoni 11, 23851 Galbiate (LC)',
     hours:{it:'Mer e Sab 9:00–18:00', en:'Wed & Sat 9:00–18:00'},
     addedAgo:6, rating:13,
     comments:[
