@@ -1,6 +1,6 @@
 const ASSETS = {
   // Percorso della mappa di Lecco che hai appena creato
-  mappa: "images/LeccoMap.png", 
+  mappa: "images/mappafinal1.png", 
   
   // Icone dei luoghi (se le hai salvate come file .png o .jpg)
   icons: {
@@ -28,14 +28,23 @@ element.src = ASSETS.mappa;
 element.alt = 'Lecco Map';
 document.body.appendChild(element);
 /* ====================================================================
-   1. CONFIG
+   1. CONFIG const CONFIG = {
+  // ...
+  BOUNDS: { 
+    north: 45.89989, 
+    south: 45.83559, 
+    west: 9.35981, 
+    east: 9.44159 
+  },
+  IMG_ASPECT: 475 / 556, // Rapporto 0.85 (Mappa verticale)
+  // ...
    ==================================================================== */
 const CONFIG = {
   LECCO: { lat: 45.8566, lng: 9.3965 },
   // bounding box della mappa grafica (provincia / area di Lecco):
   // serve a proiettare lat/lng dei luoghi sulla mappa illustrata.
-  BOUNDS: { north: 45.8840, south: 45.8340, west: 9.3788, east: 9.4165 },
-  IMG_ASPECT: 1424 / 750,   // aspect ratio dell'immagine mappa (larghezza/altezza)
+  BOUNDS: { north:  45.89989, south: 45.83559, west: 9.35981, east: 9.44159 },
+  IMG_ASPECT: 475 / 556,   // aspect ratio dell'immagine mappa (larghezza/altezza)
   ZOOM_MIN: 1, ZOOM_MAX: 2.6, ZOOM_STEP: 0.45
 };
 
