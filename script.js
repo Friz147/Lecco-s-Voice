@@ -39,9 +39,6 @@ const CONFIG = {
   ZOOM_MIN: 1, ZOOM_MAX: 2.6, ZOOM_STEP: 0.45
 };
 
-// Esempio d'uso per un pin a Lecco Centro (approssimativo)
-const pinFilet = getPinPosition(45.8558, 9.3900);
-console.log(pinFilet); // Output: { left: "29.7%", top: "56.4%" }
 /* ====================================================================
    2. I18N — tutte le stringhe UI
    ==================================================================== */
