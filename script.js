@@ -24,7 +24,8 @@ const CONFIG = {
   LECCO: { lat: 45.8566, lng: 9.3965 },
   // bounding box della mappa grafica (provincia / area di Lecco):
   // serve a proiettare lat/lng dei luoghi sulla mappa illustrata.
-  BOUNDS: { north: 45.8720, south: 45.8400, west: 9.3760, east: 9.4180 },
+  BOUNDS: { north: 45.8840, south: 45.8340, west: 9.3788, east: 9.4165 },
+  IMG_ASPECT: 1424 / 750,   // aspect ratio dell'immagine mappa (larghezza/altezza)
   ZOOM_MIN: 1, ZOOM_MAX: 2.6, ZOOM_STEP: 0.45
 };
 
@@ -149,7 +150,7 @@ const CAT_ORDER = ['agricoltori','macellai','pescivendoli','panifici','ristorato
 let PLACES = [
   {
     id:1, category:'agricoltori', name:'Mercato contadino Est',
-    lat:45.8585, lng:9.4005, image:null,
+    lat:45.84559354410131, lng:9.394576437718067, image:null, /*45.84559354410131 9.394576437718067*/
     description:{
       it:'Scopri tutto quello che si nasconde nelle campagne lecchesi: frutta, verdura e tante altre specialità locali.',
       en:'Discover everything hidden in the Lecco countryside: fruit, vegetables and many other local specialities.'},
@@ -296,12 +297,42 @@ const MapEngine = (() => {
   const stage    = document.getElementById('mapStage');
   const frame    = document.getElementById('mapFrame');
 
-  /* --- proietta lat/lng -> % dentro la mappa grafica --- */
+  /* --- proietta lat/lng -> % dentro la mappa visibile ---
+     Tiene conto del crop di object-fit:cover. L'immagine è più larga
+     del riquadro, quindi i bordi sinistro/destro vengono tagliati.
+     Questa funzione compensa lo scarto automaticamente. */
   function project(lat, lng){
     const b = CONFIG.BOUNDS;
-    const x = (lng - b.west) / (b.east - b.west);
-    const y = (b.north - lat) / (b.north - b.south);
-    return { x: Math.max(0.05,Math.min(.95,x))*100, y: Math.max(0.07,Math.min(.93,y))*100 };
+
+    // 1. posizione come frazione dell'immagine INTERA (0–1)
+    const imgX = (lng - b.west)  / (b.east - b.west);
+    const imgY = (b.north - lat) / (b.north - b.south);
+
+    // 2. calcola quanto object-fit:cover taglia
+    const fw = frame.clientWidth  || 360;
+    const fh = frame.clientHeight || 432;
+    const frameAR = fw / fh;
+    const imgAR   = CONFIG.IMG_ASPECT;
+
+    let x, y;
+    if (imgAR > frameAR) {
+      // immagine più larga del riquadro → i lati vengono tagliati
+      const visFrac  = frameAR / imgAR;         // frazione visibile della larghezza
+      const cropFrac = (1 - visFrac) / 2;       // taglio per lato
+      x = (imgX - cropFrac) / visFrac;          // rimappa nel range visibile
+      y = imgY;
+    } else {
+      // immagine più alta del riquadro → top/bottom tagliati
+      const visFrac  = imgAR / frameAR;
+      const cropFrac = (1 - visFrac) / 2;
+      x = imgX;
+      y = (imgY - cropFrac) / visFrac;
+    }
+
+    return {
+      x: Math.max(1, Math.min(99, x * 100)),
+      y: Math.max(1, Math.min(99, y * 100))
+    };
   }
 
   /* --- SVG del pin (goccia + icona categoria) --- */
@@ -738,5 +769,12 @@ function init(){
   applyI18n();          // -> renderRail + renderLegend + renderCatSelect
   MapEngine.init();     // -> disegna mappa SVG + pin
   MapEngine.setFilter(FILTER);
+
+  // ricalcola posizione pin se la finestra cambia dimensione (ruota telefono, ecc.)
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => MapEngine.refresh(), 200);
+  });
 }
 init();
