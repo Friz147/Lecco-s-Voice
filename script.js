@@ -1,6 +1,6 @@
 const ASSETS = {
   // Percorso della mappa di Lecco che hai appena creato
-  mappa: "images/lecco-valsassina-map.png", 
+  mappa: "images/LeccoMap.png", 
   
   // Icone dei luoghi (se le hai salvate come file .png o .jpg)
   icons: {
