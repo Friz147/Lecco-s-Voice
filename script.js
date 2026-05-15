@@ -300,6 +300,25 @@ let PLACES = [
         }
       }
     ]
+  },
+  {
+    id:8, category:'macellai', name:'Nuova LeccoLatte s.c.a.',
+    lat:45.88556761246046, lng:9.418803373058465, image:null, /*45.88556761246046, 9.418803373058465, remember those coordinates are sliglitly wrong, else it won't fit in the map*/
+    description:{it:'latteria e shop di prodotti caseari locali, formaggi, yogurt e prodotti tipici.',
+                 en:'Dairy shop selling local cheeses, yogurt, and regional dairy products.'},
+    address:'Via Provinciale 83, 23868 Ballabio (LC)',
+    hours:{it:'Lun–Mar 09:30–15:30 Mer-Dom 9:30–18:00', en:'Mon–Tue 09:30–15:30 Wed–Sun 9:30–18:00'},
+    addedAgo:6, rating:13,
+    comments:[
+      { author:'Anna B.', ago:5,
+        text:{
+          it:{ pos:'Verdure saporitissime, si vede che sono coltivate con cura. Prezzi onesti.',
+               neg:'Aperto solo due giorni a settimana, bisogna organizzarsi.' },
+          en:{ pos:'Very flavorful vegetables, you can tell they\'re grown with care. Fair prices.',
+               neg:'Only open two days a week, you need to plan ahead.' }
+        }
+      }
+    ]
   }
 ];
 
