@@ -793,7 +793,6 @@ renderStars();
 
 /* --- submit: aggiungi posto --- */
 $('#apSend').onclick = () => {
-  const name = $('#rvName').value.trim() || (LANG==='it'?'Anonimo':'Anonymous');
   const name = $('#apName').value.trim();
   const cat  = $('#apCat').value;
   const addr = $('#apAddr').value.trim();
