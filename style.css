@@ -208,9 +208,20 @@ ul{list-style:none;}
   overflow:hidden;
   box-shadow:var(--shadow-card);
   background:#e9e3d4;
-  /* touch-action is set dynamically via JS: 'none' when zoomed (for pan),
-     empty when at scale=1 so 1-finger touch scrolls the page normally */
+  /* Scroll is handled by the #mapOverlay child (touch-action:pan-y).
+     No touch-action needed here. */
 }
+/* map scroll overlay — sits above the map content (z-index 10, below rail/zoom at 20).
+   touch-action:pan-y lets a single finger scroll the page naturally.
+   When zoomed in, JS adds .pass-through so 1-finger pans the map instead. */
+.map-overlay{
+  position:absolute;inset:0;z-index:10;
+  touch-action:pan-y;
+  background:transparent;
+  border-radius:var(--radius);
+}
+.map-overlay.pass-through{pointer-events:none;}
+
 #mapStage{
   position:absolute;inset:0;
   transform-origin:center center;

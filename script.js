@@ -410,6 +410,11 @@ const MapEngine = (() => {
   let scale = 1, panX = 0, panY = 0;
   let singleTouch = null;  // tracks 1-finger drag when scale > 1
 
+  // The overlay sits above the map (z-index 10).
+  // touch-action:pan-y on it lets 1-finger scroll the page.
+  // When zoomed in we add .pass-through so touches reach the map stage.
+  const mapOverlay = document.getElementById('mapOverlay');
+
   function clampPan(){
     const maxX = (scale - 1) * frame.clientWidth  / 2;
     const maxY = (scale - 1) * frame.clientHeight / 2;
@@ -420,14 +425,25 @@ const MapEngine = (() => {
   function applyTransform(){
     clampPan();
     stage.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
-    // Allow page scroll when at base zoom; lock touch when zoomed so 1-finger pans the map
-    frame.style.touchAction = scale > 1 ? 'none' : '';
+    // When zoomed: overlay is transparent to pointer events → 1-finger drag pans map.
+    // When at base scale: overlay is active → 1-finger touch scrolls the page.
+    mapOverlay.classList.toggle('pass-through', scale > 1);
     // pin si rimpiccioliscono proporzionalmente allo zoom
     const ps = 1 / scale;
     pinLayer.querySelectorAll('.pin').forEach(el => {
       el.style.transform = `translate(-50%,-100%) scale(${ps})`;
     });
   }
+
+  // Forward taps on the overlay to whatever pin (if any) is underneath.
+  // This keeps pins tappable when the overlay is active (scale === 1).
+  mapOverlay.addEventListener('click', e => {
+    mapOverlay.style.pointerEvents = 'none';
+    const hit = document.elementFromPoint(e.clientX, e.clientY);
+    mapOverlay.style.pointerEvents = '';
+    const pin = hit && hit.closest('.pin');
+    if (pin) pin.click();
+  });
 
   function setZoom(next, cx, cy){
     const prev = scale;
@@ -442,10 +458,10 @@ const MapEngine = (() => {
     applyTransform();
   }
 
-  /* --- 1-finger drag (pan) --- */
+  /* --- 1-finger drag (pan) via mouse --- */
   let drag = null;
   frame.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'touch' && touches.size > 0) return; // gestito da touch
+    if (e.pointerType === 'touch') return; // handled by touch events below
     if (scale <= 1) return;
     drag = { x:e.clientX, y:e.clientY, px:panX, py:panY };
     stage.classList.add('dragging');
@@ -460,13 +476,16 @@ const MapEngine = (() => {
     if (drag){ drag = null; stage.classList.remove('dragging'); }
   });
 
-  /* --- pinch-to-zoom (2 dita / trackpad) --- */
+  /* --- pinch-to-zoom + 1-finger pan (touch) ---
+     Touch events bubble from overlay (or mapStage when pass-through) up to frame,
+     so a single set of listeners on frame handles both states. */
   const touches = new Map();
   let pinchStart = null;
 
   frame.addEventListener('touchstart', e => {
     for (const t of e.changedTouches) touches.set(t.identifier, t);
     if (touches.size === 2){
+      // 2-finger pinch: prevent page scroll / native zoom
       e.preventDefault();
       singleTouch = null;
       const [a,b] = [...touches.values()];
@@ -478,7 +497,7 @@ const MapEngine = (() => {
         px: panX, py: panY
       };
     } else if (touches.size === 1 && scale > 1) {
-      // begin 1-finger pan when already zoomed in
+      // 1-finger pan when already zoomed (overlay is pass-through so this fires)
       const [t] = [...touches.values()];
       singleTouch = { x: t.clientX, y: t.clientY, px: panX, py: panY };
     }
@@ -501,13 +520,17 @@ const MapEngine = (() => {
       if (scale <= 1){ panX=0; panY=0; }
       applyTransform();
     } else if (singleTouch && touches.size === 1 && scale > 1) {
-      // 1-finger pan when zoomed in
-      e.preventDefault();
+      // 1-finger pan when zoomed in; use a small threshold so taps still register
       const [t] = [...touches.values()];
-      panX = singleTouch.px + (t.clientX - singleTouch.x);
-      panY = singleTouch.py + (t.clientY - singleTouch.y);
-      stage.classList.add('dragging');
-      applyTransform();
+      const dx = t.clientX - singleTouch.x;
+      const dy = t.clientY - singleTouch.y;
+      if (Math.hypot(dx, dy) > 6) {
+        e.preventDefault();
+        panX = singleTouch.px + dx;
+        panY = singleTouch.py + dy;
+        stage.classList.add('dragging');
+        applyTransform();
+      }
     }
   }, {passive:false});
 
@@ -770,6 +793,7 @@ renderStars();
 
 /* --- submit: aggiungi posto --- */
 $('#apSend').onclick = () => {
+  const name = $('#rvName').value.trim() || (LANG==='it'?'Anonimo':'Anonymous');
   const name = $('#apName').value.trim();
   const cat  = $('#apCat').value;
   const addr = $('#apAddr').value.trim();

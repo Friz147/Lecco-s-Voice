@@ -77,6 +77,9 @@
       <div class="map-wrap">
         <div class="map-frame" id="mapFrame">
           <!-- mappa grafica della provincia di Lecco (pin + mappa scalano insieme) -->
+          <!-- scroll overlay: intercepts 1-finger touch so the page scrolls normally;
+               hidden (pointer-events:none) when zoomed so 1-finger pans the map -->
+          <div id="mapOverlay" class="map-overlay"></div>
           <div id="mapStage">
             <img id="mapImg" alt="Mappa di Lecco" src="images/mappafinal1.png">
             <div class="fb-watermark">Lecco's Voice</div>
