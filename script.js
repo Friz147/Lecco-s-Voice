@@ -408,6 +408,7 @@ const MapEngine = (() => {
 
   /* --- zoom + pan + PINCH-TO-ZOOM sulla mappa --- */
   let scale = 1, panX = 0, panY = 0;
+  let singleTouch = null;  // tracks 1-finger drag when scale > 1
 
   function clampPan(){
     const maxX = (scale - 1) * frame.clientWidth  / 2;
@@ -419,6 +420,8 @@ const MapEngine = (() => {
   function applyTransform(){
     clampPan();
     stage.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
+    // Allow page scroll when at base zoom; lock touch when zoomed so 1-finger pans the map
+    frame.style.touchAction = scale > 1 ? 'none' : '';
     // pin si rimpiccioliscono proporzionalmente allo zoom
     const ps = 1 / scale;
     pinLayer.querySelectorAll('.pin').forEach(el => {
@@ -465,6 +468,7 @@ const MapEngine = (() => {
     for (const t of e.changedTouches) touches.set(t.identifier, t);
     if (touches.size === 2){
       e.preventDefault();
+      singleTouch = null;
       const [a,b] = [...touches.values()];
       pinchStart = {
         dist: Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY),
@@ -473,6 +477,10 @@ const MapEngine = (() => {
         cy: (a.clientY+b.clientY)/2 - frame.getBoundingClientRect().top  - frame.clientHeight/2,
         px: panX, py: panY
       };
+    } else if (touches.size === 1 && scale > 1) {
+      // begin 1-finger pan when already zoomed in
+      const [t] = [...touches.values()];
+      singleTouch = { x: t.clientX, y: t.clientY, px: panX, py: panY };
     }
   }, {passive:false});
 
@@ -492,16 +500,30 @@ const MapEngine = (() => {
       panY = pinchStart.py + (cy - pinchStart.cy);
       if (scale <= 1){ panX=0; panY=0; }
       applyTransform();
+    } else if (singleTouch && touches.size === 1 && scale > 1) {
+      // 1-finger pan when zoomed in
+      e.preventDefault();
+      const [t] = [...touches.values()];
+      panX = singleTouch.px + (t.clientX - singleTouch.x);
+      panY = singleTouch.py + (t.clientY - singleTouch.y);
+      stage.classList.add('dragging');
+      applyTransform();
     }
   }, {passive:false});
 
   frame.addEventListener('touchend', e => {
     for (const t of e.changedTouches) touches.delete(t.identifier);
     if (touches.size < 2) pinchStart = null;
+    if (touches.size === 0) {
+      singleTouch = null;
+      stage.classList.remove('dragging');
+    }
   });
   frame.addEventListener('touchcancel', e => {
     for (const t of e.changedTouches) touches.delete(t.identifier);
     pinchStart = null;
+    singleTouch = null;
+    stage.classList.remove('dragging');
   });
 
   /* --- mouse wheel / trackpad zoom --- */
