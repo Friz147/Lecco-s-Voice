@@ -1,50 +1,28 @@
 <!--
-  ============================================================================
   LECCO'S VOICE — Mobile-first web app
-  ============================================================================
-  Single-file build (HTML + CSS + JS). Mobile-first, max-width 390px.
-
-  STRUTTURA DEL CODICE (modulare, pronta per un backend):
-    0. ASSETS ............ immagini (logo, sfondo hero, foto) base64
-    1. CONFIG ............ impostazioni: bounding box mappa, limiti zoom
-    2. I18N .............. tutte le stringhe UI in IT / EN
-    3. CATEGORIES ........ categorie + colori + icone (carota, mucca, ...)
-    4. PLACES ............ dati dei luoghi  ← SOSTITUISCI con i tuoi dati / API
-    5. MapEngine ......... mappa grafica (SVG illustrato della provincia di
-                           Lecco) + proiezione lat/lng dei pin + zoom/pan.
-                           Per il backend basta cambiare PLACES.
-    6. UI / RENDER ....... render delle pagine e degli overlay (bottom sheet)
-    7. EVENTS ............ navigazione, filtri, lingua, form
-
-  MAPPA:
-    Mappa grafica illustrata (nessuna libreria esterna, nessuna API key).
-    Copre l'area della provincia di Lecco. I pin sono posizionati proiettando
-    lat/lng sul box CONFIG.BOUNDS. Zoom +/- e trascinamento per il pan.
-
-  FONT:
-    Un solo font (Fraunces) via le variabili --font-display / --font-body.
-    Per i font custom basta cambiare quelle due variabili.
-  ============================================================================
+  Sezioni JS: ASSETS · CONFIG · I18N · CATEGORIES · PLACES · MapEngine
+              · UI/RENDER · OVERLAYS · EVENTS · INIT
+  Mappa illustrata della provincia di Lecco. Nessuna libreria esterna.
+  I pin sono proiettati da lat/lng su CONFIG.BOUNDS. Font: Fraunces.
 -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lecco's Voice</title>
 <link rel="stylesheet" href="style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600;1,9..144,900&display=swap" rel="stylesheet">
-
 </head>
 <body>
 <div id="app">
 
-  <!-- ============ HEADER ============ -->
+  <!-- HEADER -->
   <header class="header">
     <div class="brand">
-      <span class="brand-logo"><img id="brandLogo" src="images/icons/Logo.png" alt="Lecco's Voice"></span>
+      <span class="brand-logo"><img id="brandLogo" src="images/icons/Logo.png" alt="Lecco's Voice" decoding="async"></span>
       <span class="brand-name">Welcome!</span>
     </div>
     <nav class="nav">
@@ -58,13 +36,12 @@
     </button>
   </header>
 
-  <!-- ============ SCROLL AREA ============ -->
+  <!-- SCROLL AREA -->
   <div class="scroll" id="scroll">
 
-    <!-- ---------- PAGE: MAP ---------- -->
+    <!-- PAGE: MAP -->
     <section class="page active" id="page-map">
 
-      <!-- HERO -->
       <div class="hero">
         <div class="hero-bg" id="heroBg"></div>
         <h1>Lecco's<br>Voice</h1>
@@ -73,53 +50,45 @@
 
       <h2 class="section-title" data-i18n="map.question"></h2>
 
-      <!-- MAP -->
       <div class="map-wrap">
         <div class="map-frame" id="mapFrame">
-          <!-- mappa grafica della provincia di Lecco (pin + mappa scalano insieme) -->
-          <!-- scroll overlay: intercepts 1-finger touch so the page scrolls normally;
-               hidden (pointer-events:none) when zoomed so 1-finger pans the map -->
+          <!-- overlay catches 1-finger touch so the page scrolls; JS adds .pass-through when zoomed -->
           <div id="mapOverlay" class="map-overlay"></div>
           <div id="mapStage">
-            <img id="mapImg" alt="Mappa di Lecco" src="images/mappafinal1.png">
+            <img id="mapImg" alt="Mappa di Lecco" src="images/mappafinal1.png" decoding="async" fetchpriority="high">
             <div class="fb-watermark">Lecco's Voice</div>
-            <div id="pinLayer" style="position:absolute;inset:0;z-index:5;pointer-events:none;"></div>
+            <div id="pinLayer" style="position:absolute;inset:0;z-index:5;pointer-events:none"></div>
           </div>
 
-          <!-- filter rail -->
           <div class="rail">
             <button class="rail-add" id="railAdd" aria-label="Aggiungi luogo">+</button>
             <div class="rail-list" id="railList"></div>
           </div>
 
-          <!-- zoom -->
           <div class="zoom">
             <button id="zoomIn">+</button>
             <button id="zoomOut">&minus;</button>
           </div>
         </div>
 
-        <!-- legend -->
         <div class="legend" id="legend"></div>
       </div>
 
-      <!-- TRUST -->
       <div class="trust">
         <h3 data-i18n="trust.title"></h3>
         <p data-i18n="trust.text"></p>
         <button id="trustCta" class="btn-ghost" data-i18n="trust.cta"></button>
       </div>
 
-      <!-- FOOTER -->
       <footer class="footer">
-        <span class="brand-logo"><img class="footLogo" alt="Lecco's Voice" src="images/icons/Logo.png"></span>
+        <span class="brand-logo"><img class="footLogo" alt="Lecco's Voice" src="images/icons/Logo.png" loading="lazy" decoding="async"></span>
         <div class="footer-social">
           <button>Facebook</button><button>Instagram</button><button>Twitter</button>
         </div>
       </footer>
     </section>
 
-    <!-- ---------- PAGE: INFO ---------- -->
+    <!-- PAGE: INFO -->
     <section class="page" id="page-info">
       <div class="info-page">
         <h2 data-i18n="info.title"></h2>
@@ -129,8 +98,8 @@
         </div>
 
         <div class="photos">
-          <div class="polaroid"><div class="ph"><img class="infoPhoto" data-photo="1" src="images/photo1.png" alt=""></div></div>
-          <div class="polaroid"><div class="ph"><img class="infoPhoto" data-photo="2" src="images/photo2.png" alt=""></div></div>
+          <div class="polaroid"><div class="ph"><img class="infoPhoto" data-photo="1" src="images/photo1.png" alt="" loading="lazy" decoding="async"></div></div>
+          <div class="polaroid"><div class="ph"><img class="infoPhoto" data-photo="2" src="images/photo2.png" alt="" loading="lazy" decoding="async"></div></div>
         </div>
 
         <!-- CONTACT FORM -->
@@ -154,7 +123,7 @@
       </div>
 
       <footer class="footer">
-        <span class="brand-logo"><img class="footLogo" alt="Lecco's Voice" src="images/icons/Logo.png"></span>
+        <span class="brand-logo"><img class="footLogo" alt="Lecco's Voice" src="images/icons/Logo.png" loading="lazy" decoding="async"></span>
         <div class="footer-social">
           <button>Facebook</button><button>Instagram</button><button>Twitter</button>
         </div>
@@ -163,17 +132,17 @@
 
   </div><!-- /scroll -->
 
-  <!-- ============ OVERLAYS ============ -->
+  <!-- OVERLAYS -->
   <div class="scrim" id="scrim"></div>
 
-  <!-- SHEET: pin info window -->
+  <!-- SHEET: pin info -->
   <div class="sheet" id="sheetInfo">
     <button class="sheet-close" data-close>&times;</button>
     <div class="sheet-grab"></div>
     <div class="sheet-body" id="infoBody"></div>
   </div>
 
-  <!-- SHEET: add place ("La tua voce conta") -->
+  <!-- SHEET: add place -->
   <div class="sheet" id="sheetAdd">
     <button class="sheet-close" data-close>&times;</button>
     <div class="sheet-grab"></div>
@@ -202,7 +171,7 @@
     </div>
   </div>
 
-  <!-- SHEET: review form ("La tua voce conta" / recensione) -->
+  <!-- SHEET: review -->
   <div class="sheet" id="sheetReview">
     <button class="sheet-close" data-close>&times;</button>
     <div class="sheet-grab"></div>

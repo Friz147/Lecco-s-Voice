@@ -1,56 +1,34 @@
+/* LECCO'S VOICE — script.js
+   ASSETS · CONFIG · I18N · CATEGORIES · PLACES · MapEngine
+   UI/RENDER · OVERLAYS · EVENTS · INIT */
+
+/* ---------- 0. ASSETS ---------- */
 const ASSETS = {
-  // Percorso della mappa di Lecco che hai appena creato
-  mappa: "images/mappafinal1.png", 
-  
-  // Icone dei luoghi (se le hai salvate come file .png o .jpg)
+  mappa: "images/mappafinal1.png",
   icons: {
-    carrot: "images/icons/carrot.png",
-    cow:    "images/icons/cow.png",
-    fish:   "images/icons/fish.png",
+    carrot:    "images/icons/carrot.png",
+    cow:       "images/icons/cow.png",
+    fish:      "images/icons/fish.png",
     croissant: "images/icons/croissant.png",
     cutlery:   "images/icons/posateIcon.png"
   },
-  
-  // Logo e sfondo
-  logo: "images/icons/Logo.png",
-  hero: "images/SfondoHero.png",
+  logo:   "images/icons/Logo.png",
+  hero:   "images/SfondoHero.png",
   photo1: "images/photo1.png",
-  photo2: "images/photo2.png",
+  photo2: "images/photo2.png"
 };
-// Create an image element
-const img = new Image();
-img.src = ASSETS.mappa;
-document.body.appendChild(img);
 
-// Or in HTML
-const element = document.createElement('img');
-element.src = ASSETS.mappa;
-element.alt = 'Lecco Map';
-document.body.appendChild(element);
-/* ====================================================================
-   1. CONFIG const CONFIG = {
-  // ...
-  BOUNDS: { 
-    north: 45.89989, 
-    south: 45.83559, 
-    west: 9.35981, 
-    east: 9.44159 
-  },
-  IMG_ASPECT: 475 / 556, // Rapporto 0.85 (Mappa verticale)
-  // ...
-   ==================================================================== */
+/* ---------- 1. CONFIG ---------- */
 const CONFIG = {
-  LECCO: { lat: 45.8566, lng: 9.3965 },
-  // bounding box della mappa grafica (provincia / area di Lecco):
-  // serve a proiettare lat/lng dei luoghi sulla mappa illustrata.
-  BOUNDS: { north:  45.89989, south: 45.83559, west: 9.35981, east: 9.44159 },
-  IMG_ASPECT: 475 / 556,   // aspect ratio dell'immagine mappa (larghezza/altezza)
-  ZOOM_MIN: 1, ZOOM_MAX: 2.6, ZOOM_STEP: 0.45
+  LECCO:      { lat: 45.8566, lng: 9.3965 },
+  BOUNDS:     { north: 45.89989, south: 45.83559, west: 9.35981, east: 9.44159 },
+  IMG_ASPECT: 475 / 556,
+  ZOOM_MIN:   1,
+  ZOOM_MAX:   2.6,
+  ZOOM_STEP:  0.45
 };
 
-/* ====================================================================
-   2. I18N — tutte le stringhe UI
-   ==================================================================== */
+/* ---------- 2. I18N ---------- */
 const I18N = {
   it: {
     'nav.map':'Map', 'nav.info':'Info',
@@ -135,41 +113,27 @@ const I18N = {
 };
 let LANG = 'it';
 const t = (key, vars) => {
-  let s = (I18N[LANG] && I18N[LANG][key]) || key;
-  if (vars) Object.keys(vars).forEach(k => s = s.replace('{'+k+'}', vars[k]));
+  let s = I18N[LANG]?.[key] ?? key;
+  if (vars) for (const k in vars) s = s.replaceAll('{'+k+'}', vars[k]);
   return s;
 };
 
-/* ====================================================================
-   3. CATEGORIES — colori + icone SVG (carota, mucca, pesce, croissant, posate)
-   ==================================================================== */
-/* icone categoria — PNG forniti (bianchi su trasparente), in ASSETS.icons.
-   catIcon(name) restituisce uno <span> ricolorabile (CSS mask). Per cambiare
-   le icone basta sostituire i PNG in ASSETS.icons. */
-function catIcon(name){
-  return `<span class="cat-ic" style="--ic:url('${ASSETS.icons[name]}')"></span>`;
-}
+/* ---------- 3. CATEGORIES ---------- */
+const catIcon = name => `<span class="cat-ic" style="--ic:url('${ASSETS.icons[name]}')"></span>`;
 const CATEGORIES = {
-  agricoltori:  { color:'var(--c-agricoltori)',  raw:'#2f6b3f', icon:'carrot'    },
-  macellai:     { color:'var(--c-macellai)',     raw:'#6e3a26', icon:'cow'       },
-  pescivendoli: { color:'var(--c-pescivendoli)', raw:'#3a7fc0', icon:'fish'      },
-  panifici:     { color:'var(--c-panifici)',     raw:'#df8030', icon:'croissant' },
-  ristoratori:  { color:'var(--c-ristoratori)',  raw:'#be3a2c', icon:'cutlery'   }
+  agricoltori:  { raw:'#2f6b3f', icon:'carrot'    },
+  macellai:     { raw:'#6e3a26', icon:'cow'       },
+  pescivendoli: { raw:'#3a7fc0', icon:'fish'      },
+  panifici:     { raw:'#df8030', icon:'croissant' },
+  ristoratori:  { raw:'#be3a2c', icon:'cutlery'   }
 };
-const CAT_ORDER = ['agricoltori','macellai','pescivendoli','panifici','ristoratori'];
+const CAT_ORDER = Object.keys(CATEGORIES);
 
-/* ====================================================================
-   4. PLACES — DATI  ← SOSTITUISCI con i tuoi dati o una fetch() al backend
-   --------------------------------------------------------------------
-   Struttura di un luogo:
-   { id, category, name, lat, lng, image, description{it,en},
-     address, hours{it,en}, addedAgo, rating,
-     comments:[ { author, ago, text:{ it:{pos,neg}, en:{pos,neg} } } ] }
-   ==================================================================== */
+/* ---------- 4. PLACES ---------- */
 let PLACES = [
   {
     id:1, category:'ristoratori', name:'Herba Monstrum',
-    lat:45.84559354410131, lng:9.394576437718067, image:null, /*45.84559354410131 9.394576437718067*/
+    lat:45.84559354410131, lng:9.394576437718067, image:null,
     description:{
       it:'La nostra esperienza nasce dall\u2019amore per le Birre, quelle con la B maiuscola e con la A di artigianali. Birre originali, vive, non pastorizzate. Birre in cui le materie prime sono trattate con cura e non sminuite dai processi della grande industria. Dopo circa 10 anni di homebrewing.',
       en:'Our experience is born from a love for Beers—those with a capital B and an A for Artigianali (Craft). Original, living, unpasteurized beers. Beers in which raw materials are treated with care and not diminished by large-scale industrial processes. This follows about 10 years of homebrewing.'},
@@ -189,7 +153,7 @@ let PLACES = [
   },
   {
     id:2, category:'ristoratori', name:'Fillet Osteria',
-    lat:45.860214174615024, lng:9.39786682607271, image:null, /*45.860214174615024, 9.39786682607271*/
+    lat:45.860214174615024, lng:9.39786682607271, image:null,
     description:{it:'Nel cuore di Lecco, Filet è il luogo dove i sapori si trasformano in storie da raccontare. Dal bancone della salumeria ai tavoli della nostra osteria, ogni tua visita diventa un percorso coinvolgente attraverso profumi, consistenze e gusti.',
                  en:'In the heart of Lecco, Filet is where flavors transform into stories worth telling. From our deli counter to the tables of our osteria, every visit becomes an immersive journey through aromas, textures, and tastes.'},
     address:'Corso Giacomo Matteotti, 71, 23900 Lecco LC',
@@ -208,7 +172,7 @@ let PLACES = [
   },
   {
     id:3, category:'pescivendoli', name:'Da Ceko Il Pescatore',
-    lat:45.84403722665931, lng:9.399037695388786, image:null, /*45.84403722665931, 9.399037695388786*/
+    lat:45.84403722665931, lng:9.399037695388786, image:null,
     description:{it:'Cucina tradizionale lariana con vista sul lago: pesce di lago e piatti tipici.',
                  en:'Traditional Larian cuisine with a lake view: lake fish and typical dishes.'},
     address:'Piazza Era 8, 23900 Lecco (LC)',
@@ -227,7 +191,7 @@ let PLACES = [
   },
   {
     id:4, category:'ristoratori', name:'Taverna ai Poggi',
-    lat:45.85966786273042, lng:9.411567354908135, image:null, /*45.85966786273042, 9.411567354908135*/
+    lat:45.85966786273042, lng:9.411567354908135, image:null,
     description:{it:'ristorante e pizzeria con cucina italiana tradizionale e terrazza panoramica.',
                  en:'Traditional Italian restaurant and pizzeria with a panoramic terrace.'},
     address:'Via ai Poggi 14/20, 23900 Lecco (LC)',
@@ -246,10 +210,10 @@ let PLACES = [
   },
   {
     id:5, category:'agricoltori', name:'Il Fruttorto Di Fumagalli Marco E C. Snc',
-    lat:45.85422732090137, lng:9.394485627920242, image:null, /*45.85422732090137, 9.394485627920242*/
+    lat:45.85422732090137, lng:9.394485627920242, image:null,
     description:{it:'negozio di frutta e verdura con prodotti agricoli locali e stagionali.',
                  en:'Fruit and vegetable shop offering local and seasonal agricultural produce.'},
-    address:'Via Marco d’Oggiono 6, 23900 Lecco (LC)',
+    address:'Via Marco d\u2019Oggiono 6, 23900 Lecco (LC)',
     hours:{it:'Lun–Sab 6:30–19:00', en:'Mon–Sat 6:30–19:00'},
     addedAgo:20, rating:11,
     comments:[
@@ -265,7 +229,7 @@ let PLACES = [
   },
   {
     id:6, category:'macellai', name:'Colombo Carni Di Colombo Walter',
-    lat:45.85488627429565, lng: 9.391058341414105, image:null, /*45.85488627429565, 9.391058341414105*/
+    lat:45.85488627429565, lng:9.391058341414105, image:null,
     description:{it:'macelleria tradizionale specializzata in carni selezionate.',
                  en:'Traditional butcher shop specializing in selected high-quality meats.'},
     address:'Via Don Antonio Mascari 74, 23900 Lecco (LC)',
@@ -284,7 +248,7 @@ let PLACES = [
   },
   {
     id:7, category:'panifici', name:'Ronchetti Giovanni & C.(S.N.C.)',
-    lat:45.81613836402201, lng:9.377249283209123, image:null, /*45.81613836402201, 9.377249283209123*/
+    lat:45.81613836402201, lng:9.377249283209123, image:null,
     description:{it:'panificio e pasticceria artigianale storica di Galbiate.',
                  en:'Historic artisan bakery and pastry shop.'},
     address:'Piazza Alessandro Manzoni 11, 23851 Galbiate (LC)',
@@ -303,7 +267,7 @@ let PLACES = [
   },
   {
     id:8, category:'macellai', name:'Nuova LeccoLatte s.c.a.',
-    lat:45.88556761246046, lng:9.418803373058465, image:null, /*45.88556761246046, 9.418803373058465, remember those coordinates are sliglitly wrong, else it won't fit in the map*/
+    lat:45.88556761246046, lng:9.418803373058465, image:null,
     description:{it:'latteria e shop di prodotti caseari locali, formaggi, yogurt e prodotti tipici.',
                  en:'Dairy shop selling local cheeses, yogurt, and regional dairy products.'},
     address:'Via Provinciale 83, 23868 Ballabio (LC)',
@@ -322,67 +286,50 @@ let PLACES = [
   }
 ];
 
-/* ====================================================================
-   5. MapEngine — astrazione mappa
-   --------------------------------------------------------------------
-   Espone: init(), refresh(), setFilter(cats), onPinClick(cb),
-           zoom(delta). Mappa grafica illustrata, nessuna libreria esterna.
-   ==================================================================== */
+/* ---------- helpers ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---------- 5. MapEngine ---------- */
 const MapEngine = (() => {
   let pinClickCb = () => {};
   let activeFilter = new Set(CAT_ORDER);
-  const pinLayer = document.getElementById('pinLayer');
-  const stage    = document.getElementById('mapStage');
-  const frame    = document.getElementById('mapFrame');
+  const pinLayer   = $('#pinLayer');
+  const stage      = $('#mapStage');
+  const frame      = $('#mapFrame');
+  const mapOverlay = $('#mapOverlay');
 
-  /* --- proietta lat/lng -> % dentro la mappa visibile ---
-     Tiene conto del crop di object-fit:cover. L'immagine è più larga
-     del riquadro, quindi i bordi sinistro/destro vengono tagliati.
-     Questa funzione compensa lo scarto automaticamente. */
+  /* proietta lat/lng -> % sulla porzione visibile (compensa object-fit:cover) */
   function project(lat, lng){
     const b = CONFIG.BOUNDS;
-
-    // 1. posizione come frazione dell'immagine INTERA (0–1)
     const imgX = (lng - b.west)  / (b.east - b.west);
     const imgY = (b.north - lat) / (b.north - b.south);
-
-    // 2. calcola quanto object-fit:cover taglia
     const fw = frame.clientWidth  || 360;
     const fh = frame.clientHeight || 432;
     const frameAR = fw / fh;
     const imgAR   = CONFIG.IMG_ASPECT;
-
     let x, y;
     if (imgAR > frameAR) {
-      // immagine più larga del riquadro → i lati vengono tagliati
-      const visFrac  = frameAR / imgAR;         // frazione visibile della larghezza
-      const cropFrac = (1 - visFrac) / 2;       // taglio per lato
-      x = (imgX - cropFrac) / visFrac;          // rimappa nel range visibile
+      const visFrac = frameAR / imgAR;
+      const cropFrac = (1 - visFrac) / 2;
+      x = (imgX - cropFrac) / visFrac;
       y = imgY;
     } else {
-      // immagine più alta del riquadro → top/bottom tagliati
-      const visFrac  = imgAR / frameAR;
+      const visFrac = imgAR / frameAR;
       const cropFrac = (1 - visFrac) / 2;
       x = imgX;
       y = (imgY - cropFrac) / visFrac;
     }
-
     return {
       x: Math.max(1, Math.min(99, x * 100)),
       y: Math.max(1, Math.min(99, y * 100))
     };
   }
 
-  /* --- SVG del pin (goccia + icona categoria) --- */
-  function pinSVG(cat){
+  const pinSVG = cat => {
     const c = CATEGORIES[cat];
-    // goccia colorata + icona PNG bianca (ASSETS.icons) centrata
-    return `<svg viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 43C17 43 32 27 32 16A15 15 0 1 0 2 16C2 27 17 43 17 43Z" fill="${c.raw}"/>
-      <image href="${ASSETS.icons[c.icon]}" x="9" y="8" width="16" height="16"/>
-    </svg>`;
-  }
-
+    return `<svg viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg"><path d="M17 43C17 43 32 27 32 16A15 15 0 1 0 2 16C2 27 17 43 17 43Z" fill="${c.raw}"/><image href="${ASSETS.icons[c.icon]}" x="9" y="8" width="16" height="16"/></svg>`;
+  };
 
   function buildPins(){
     pinLayer.innerHTML = '';
@@ -400,20 +347,16 @@ const MapEngine = (() => {
       pinLayer.appendChild(el);
     });
     applyFilterDOM();
+    applyTransform();   // riapplica lo scale corrente ai pin appena creati
   }
   function applyFilterDOM(){
     pinLayer.querySelectorAll('.pin').forEach(el =>
       el.classList.toggle('dim', !activeFilter.has(el.dataset.cat)));
   }
 
-  /* --- zoom + pan + PINCH-TO-ZOOM sulla mappa --- */
+  /* zoom + pan state */
   let scale = 1, panX = 0, panY = 0;
-  let singleTouch = null;  // tracks 1-finger drag when scale > 1
-
-  // The overlay sits above the map (z-index 10).
-  // touch-action:pan-y on it lets 1-finger scroll the page.
-  // When zoomed in we add .pass-through so touches reach the map stage.
-  const mapOverlay = document.getElementById('mapOverlay');
+  let singleTouch = null;
 
   function clampPan(){
     const maxX = (scale - 1) * frame.clientWidth  / 2;
@@ -425,24 +368,19 @@ const MapEngine = (() => {
   function applyTransform(){
     clampPan();
     stage.style.transform = `translate(${panX}px,${panY}px) scale(${scale})`;
-    // When zoomed: overlay is transparent to pointer events → 1-finger drag pans map.
-    // When at base scale: overlay is active → 1-finger touch scrolls the page.
     mapOverlay.classList.toggle('pass-through', scale > 1);
-    // pin si rimpiccioliscono proporzionalmente allo zoom
     const ps = 1 / scale;
     pinLayer.querySelectorAll('.pin').forEach(el => {
       el.style.transform = `translate(-50%,-100%) scale(${ps})`;
     });
   }
 
-  // Forward taps on the overlay to whatever pin (if any) is underneath.
-  // This keeps pins tappable when the overlay is active (scale === 1).
+  /* overlay click → forward to pin underneath (so pins stay tappable at scale=1) */
   mapOverlay.addEventListener('click', e => {
     mapOverlay.style.pointerEvents = 'none';
     const hit = document.elementFromPoint(e.clientX, e.clientY);
     mapOverlay.style.pointerEvents = '';
-    const pin = hit && hit.closest('.pin');
-    if (pin) pin.click();
+    hit?.closest('.pin')?.click();
   });
 
   function setZoom(next, cx, cy){
@@ -450,7 +388,6 @@ const MapEngine = (() => {
     scale = Math.max(CONFIG.ZOOM_MIN, Math.min(CONFIG.ZOOM_MAX, next));
     if (scale === 1){ panX = 0; panY = 0; }
     else if (cx !== undefined){
-      // zoom verso il punto del pinch / scroll
       const r = scale / prev;
       panX = cx - r * (cx - panX);
       panY = cy - r * (cy - panY);
@@ -458,11 +395,19 @@ const MapEngine = (() => {
     applyTransform();
   }
 
-  /* --- 1-finger drag (pan) via mouse --- */
+  /* pinch midpoint relative to frame center */
+  function midpoint(a, b){
+    const r = frame.getBoundingClientRect();
+    return {
+      x: (a.clientX + b.clientX) / 2 - r.left - frame.clientWidth  / 2,
+      y: (a.clientY + b.clientY) / 2 - r.top  - frame.clientHeight / 2
+    };
+  }
+
+  /* mouse drag (only when zoomed) */
   let drag = null;
   frame.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'touch') return; // handled by touch events below
-    if (scale <= 1) return;
+    if (e.pointerType === 'touch' || scale <= 1) return;
     drag = { x:e.clientX, y:e.clientY, px:panX, py:panY };
     stage.classList.add('dragging');
   });
@@ -476,30 +421,24 @@ const MapEngine = (() => {
     if (drag){ drag = null; stage.classList.remove('dragging'); }
   });
 
-  /* --- pinch-to-zoom + 1-finger pan (touch) ---
-     Touch events bubble from overlay (or mapStage when pass-through) up to frame,
-     so a single set of listeners on frame handles both states. */
+  /* touch: pinch zoom + 1-finger pan when zoomed */
   const touches = new Map();
   let pinchStart = null;
 
   frame.addEventListener('touchstart', e => {
     for (const t of e.changedTouches) touches.set(t.identifier, t);
     if (touches.size === 2){
-      // 2-finger pinch: prevent page scroll / native zoom
       e.preventDefault();
       singleTouch = null;
       const [a,b] = [...touches.values()];
+      const m = midpoint(a, b);
       pinchStart = {
         dist: Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY),
-        scale: scale,
-        cx: (a.clientX+b.clientX)/2 - frame.getBoundingClientRect().left - frame.clientWidth/2,
-        cy: (a.clientY+b.clientY)/2 - frame.getBoundingClientRect().top  - frame.clientHeight/2,
-        px: panX, py: panY
+        scale, cx: m.x, cy: m.y, px: panX, py: panY
       };
-    } else if (touches.size === 1 && scale > 1) {
-      // 1-finger pan when already zoomed (overlay is pass-through so this fires)
-      const [t] = [...touches.values()];
-      singleTouch = { x: t.clientX, y: t.clientY, px: panX, py: panY };
+    } else if (touches.size === 1 && scale > 1){
+      const [t0] = [...touches.values()];
+      singleTouch = { x: t0.clientX, y: t0.clientY, px: panX, py: panY };
     }
   }, {passive:false});
 
@@ -509,22 +448,17 @@ const MapEngine = (() => {
       e.preventDefault();
       const [a,b] = [...touches.values()];
       const dist = Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-      const r = dist / pinchStart.dist;
-      const next = Math.max(CONFIG.ZOOM_MIN, Math.min(CONFIG.ZOOM_MAX, pinchStart.scale * r));
-      scale = next;
-      // pan segue il centro delle dita
-      const cx = (a.clientX+b.clientX)/2 - frame.getBoundingClientRect().left - frame.clientWidth/2;
-      const cy = (a.clientY+b.clientY)/2 - frame.getBoundingClientRect().top  - frame.clientHeight/2;
-      panX = pinchStart.px + (cx - pinchStart.cx);
-      panY = pinchStart.py + (cy - pinchStart.cy);
-      if (scale <= 1){ panX=0; panY=0; }
+      scale = Math.max(CONFIG.ZOOM_MIN, Math.min(CONFIG.ZOOM_MAX, pinchStart.scale * (dist / pinchStart.dist)));
+      const m = midpoint(a, b);
+      panX = pinchStart.px + (m.x - pinchStart.cx);
+      panY = pinchStart.py + (m.y - pinchStart.cy);
+      if (scale <= 1){ panX = 0; panY = 0; }
       applyTransform();
-    } else if (singleTouch && touches.size === 1 && scale > 1) {
-      // 1-finger pan when zoomed in; use a small threshold so taps still register
-      const [t] = [...touches.values()];
-      const dx = t.clientX - singleTouch.x;
-      const dy = t.clientY - singleTouch.y;
-      if (Math.hypot(dx, dy) > 6) {
+    } else if (singleTouch && touches.size === 1 && scale > 1){
+      const [t0] = [...touches.values()];
+      const dx = t0.clientX - singleTouch.x;
+      const dy = t0.clientY - singleTouch.y;
+      if (Math.hypot(dx, dy) > 6){
         e.preventDefault();
         panX = singleTouch.px + dx;
         panY = singleTouch.py + dy;
@@ -534,37 +468,29 @@ const MapEngine = (() => {
     }
   }, {passive:false});
 
-  frame.addEventListener('touchend', e => {
+  function endTouch(e){
     for (const t of e.changedTouches) touches.delete(t.identifier);
     if (touches.size < 2) pinchStart = null;
-    if (touches.size === 0) {
+    if (touches.size === 0){
       singleTouch = null;
       stage.classList.remove('dragging');
     }
-  });
-  frame.addEventListener('touchcancel', e => {
-    for (const t of e.changedTouches) touches.delete(t.identifier);
-    pinchStart = null;
-    singleTouch = null;
-    stage.classList.remove('dragging');
-  });
+  }
+  frame.addEventListener('touchend', endTouch);
+  frame.addEventListener('touchcancel', endTouch);
 
-  /* --- mouse wheel / trackpad zoom --- */
+  /* mouse-wheel / trackpad-pinch zoom */
   frame.addEventListener('wheel', e => {
     e.preventDefault();
     const rect = frame.getBoundingClientRect();
-    const cx = e.clientX - rect.left - rect.width/2;
-    const cy = e.clientY - rect.top  - rect.height/2;
-    // trackpad pinch sends small deltaY with ctrlKey; scroll wheel sends larger
+    const cx = e.clientX - rect.left - rect.width  / 2;
+    const cy = e.clientY - rect.top  - rect.height / 2;
     const factor = e.ctrlKey ? e.deltaY * -0.01 : e.deltaY * -0.005;
     setZoom(scale * (1 + factor), cx, cy);
   }, {passive:false});
 
   return {
-    init(){
-      document.getElementById('mapImg').src = ASSETS.mappa;
-      buildPins();
-    },
+    init(){ $('#mapImg').src = ASSETS.mappa; buildPins(); },
     onPinClick(cb){ pinClickCb = cb; },
     setFilter(catsSet){ activeFilter = catsSet; applyFilterDOM(); },
     refresh(){ buildPins(); },
@@ -572,70 +498,48 @@ const MapEngine = (() => {
   };
 })();
 
-/* ====================================================================
-   6. UI / RENDER
-   ==================================================================== */
-const $  = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-
-/* --- applica le traduzioni a tutto il DOM --- */
+/* ---------- 6. UI / RENDER ---------- */
 function applyI18n(){
   $$('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
   $$('[data-i18n-ph]').forEach(el => el.placeholder = t(el.dataset.i18nPh));
   document.documentElement.lang = LANG;
-  // toggle lingua visivo
   $$('#langToggle span[data-lang]').forEach(s =>
     s.classList.toggle('on', s.dataset.lang === LANG));
   renderRail(); renderLegend(); renderCatSelect();
 }
 
-/* --- carica le immagini (logo, hero, foto) da ASSETS --- */
 function loadAssets(){
   $('#heroBg').style.backgroundImage = `url("${ASSETS.hero}")`;
-  // logo: lasciato vuoto — inserire qui il src quando pronto
-  // $('#brandLogo').src = ASSETS.logo;
-  // $$('.footLogo').forEach(img => img.src = ASSETS.logo);
   $$('.infoPhoto').forEach(img =>
     img.src = img.dataset.photo === '1' ? ASSETS.photo1 : ASSETS.photo2);
 }
 
-/* --- filter rail (icone verticali) --- */
 let FILTER = new Set(CAT_ORDER);   // tutte attive = nessun filtro
 function renderRail(){
   const list = $('#railList');
   list.innerHTML = CAT_ORDER.map(cat =>
-    `<button class="rail-btn ${FILTER.has(cat)?'on':''}" data-cat="${cat}"
-       aria-label="${t('cat.'+cat)}">${catIcon(CATEGORIES[cat].icon)}</button>`
+    `<button class="rail-btn ${FILTER.has(cat)?'on':''}" data-cat="${cat}" aria-label="${t('cat.'+cat)}">${catIcon(CATEGORIES[cat].icon)}</button>`
   ).join('');
   list.querySelectorAll('.rail-btn').forEach(btn => {
     btn.onclick = () => toggleFilter(btn.dataset.cat);
   });
 }
 function toggleFilter(cat){
-  // se sono tutte attive e clicco una -> mostro solo quella
-  if (FILTER.size === CAT_ORDER.length){
-    FILTER = new Set([cat]);
-  } else if (FILTER.has(cat)){
+  if (FILTER.size === CAT_ORDER.length)      FILTER = new Set([cat]);
+  else if (FILTER.has(cat)){
     FILTER.delete(cat);
-    if (FILTER.size === 0) FILTER = new Set(CAT_ORDER); // niente selezione = tutte
-  } else {
-    FILTER.add(cat);
-  }
+    if (FILTER.size === 0) FILTER = new Set(CAT_ORDER);
+  } else FILTER.add(cat);
   renderRail();
   MapEngine.setFilter(FILTER);
 }
 
-/* --- legend sotto la mappa --- */
 function renderLegend(){
   $('#legend').innerHTML = CAT_ORDER.map(cat =>
-    `<div class="legend-item">
-       <span class="legend-ic" style="color:${CATEGORIES[cat].raw}">${catIcon(CATEGORIES[cat].icon)}</span>
-       <span>${t('cat.'+cat)}</span>
-     </div>`
+    `<div class="legend-item"><span class="legend-ic" style="color:${CATEGORIES[cat].raw}">${catIcon(CATEGORIES[cat].icon)}</span><span>${t('cat.'+cat)}</span></div>`
   ).join('');
 }
 
-/* --- select categoria nel form "aggiungi posto" --- */
 function renderCatSelect(){
   const sel = $('#apCat');
   const cur = sel.value;
@@ -644,68 +548,33 @@ function renderCatSelect(){
   if (cur) sel.value = cur;
 }
 
-/* --- INFO WINDOW (sheet) per un luogo --- */
+/* ---------- INFO WINDOW (sheet) ---------- */
 let currentPlace = null;
+function commentHTML(c){
+  const ci  = c.author.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const txt = c.text[LANG];
+  return `<div class="comment"><div class="iw-av">${ci}</div><div class="c-body"><div class="c-head"><span class="c-name">${c.author}</span><span class="c-ago">${t('iw.daysAgo',{n:c.ago})}</span></div>${txt.pos ? `<p class="c-review c-pos"><span class="c-emoji">🙂</span> ${txt.pos}</p>` : ''}${txt.neg ? `<p class="c-review c-neg"><span class="c-emoji">😕</span> ${txt.neg}</p>` : ''}</div></div>`;
+}
+
 function openInfoWindow(place){
   currentPlace = place;
   const cat = CATEGORIES[place.category];
+  const comments = place.comments.length
+    ? place.comments.map(commentHTML).join('')
+    : `<div class="iw-empty">—</div>`;
+  const body = $('#infoBody');
+  body.innerHTML = `<div class="iw-hero" style="background:${cat.raw}"><div class="iw-ic">${catIcon(cat.icon)}</div><span class="iw-badge">${t('cat.'+place.category)}</span></div><div class="iw-name">${place.name}</div><div class="iw-desc">${place.description[LANG]}</div><div class="iw-meta"><div class="iw-row"><span class="k">${t('iw.address')}:</span><span>${place.address}</span></div><div class="iw-row"><span class="k">${t('iw.hours')}:</span><span>${place.hours[LANG]}</span></div></div><div class="iw-attrib"><div class="ag">${t('iw.addedAgo',{n:place.addedAgo})}</div><div class="iw-rating">♥ ${place.rating}</div></div><div class="iw-section-t">${t('iw.community')}</div><div id="commentList">${comments}</div><div class="add-comment"><input type="text" id="quickComment" placeholder="${t('iw.addComment')}"><button id="quickCommentBtn" aria-label="add">+</button></div>`;
+  body.style.background = 'var(--cream)';
 
-  const commentsHTML = place.comments.length
-    ? place.comments.map(c => {
-        const ci = c.author.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-        const txt = c.text[LANG];
-        return `<div class="comment">
-          <div class="iw-av">${ci}</div>
-          <div class="c-body">
-            <div class="c-head">
-              <span class="c-name">${c.author}</span>
-              <span class="c-ago">${t('iw.daysAgo',{n:c.ago})}</span>
-            </div>
-            ${txt.pos ? `<p class="c-review c-pos"><span class="c-emoji">🙂</span> ${txt.pos}</p>` : ''}
-            ${txt.neg ? `<p class="c-review c-neg"><span class="c-emoji">😕</span> ${txt.neg}</p>` : ''}
-          </div></div>`;
-      }).join('')
-    : `<div style="font-size:13px;color:var(--ink-soft);padding:10px 0">—</div>`;
-
-  $('#infoBody').innerHTML = `
-    <div class="iw-hero" style="background:${cat.raw}">
-      <div class="iw-ic">${catIcon(cat.icon)}</div>
-      <span class="iw-badge">${t('cat.'+place.category)}</span>
-    </div>
-    <div class="iw-name">${place.name}</div>
-    <div class="iw-desc">${place.description[LANG]}</div>
-    <div class="iw-meta">
-      <div class="iw-row"><span class="k">${t('iw.address')}:</span><span>${place.address}</span></div>
-      <div class="iw-row"><span class="k">${t('iw.hours')}:</span><span>${place.hours[LANG]}</span></div>
-    </div>
-    <div class="iw-attrib">
-      <div class="ag">${t('iw.addedAgo',{n:place.addedAgo})}</div>
-      <div class="iw-rating">♥ ${place.rating}</div>
-    </div>
-    <div class="iw-section-t">${t('iw.community')}</div>
-    <div id="commentList">${commentsHTML}</div>
-    <div class="add-comment">
-      <input type="text" id="quickComment" placeholder="${t('iw.addComment')}">
-      <button id="quickCommentBtn" aria-label="add">+</button>
-    </div>
-  `;
-  // colora la zona dietro l'hero
-  $('#infoBody').style.setProperty('background', 'var(--cream)');
-
-  // azione "+" del commento -> apre il form recensione completo
   $('#quickCommentBtn').onclick = () => {
     const quick = $('#quickComment').value.trim();
     if (quick){
-      // commento veloce inline
       place.comments.push({author: LANG==='it'?'Tu':'You', ago:0,
         text:{it:{pos:quick,neg:''},en:{pos:quick,neg:''}}});
-      openInfoWindow(place);                 // re-render
+      openInfoWindow(place);
       openSheet('sheetInfo');
       showToast(t('toast.comment'));
-    } else {
-      // niente testo -> form recensione completo
-      openSheet('sheetReview');
-    }
+    } else openSheet('sheetReview');
   };
   $('#quickComment').addEventListener('keydown', e => {
     if (e.key === 'Enter') $('#quickCommentBtn').click();
@@ -714,9 +583,7 @@ function openInfoWindow(place){
   openSheet('sheetInfo');
 }
 
-/* ====================================================================
-   7. OVERLAY / SHEET CONTROL
-   ==================================================================== */
+/* ---------- 7. OVERLAY / SHEET CONTROL ---------- */
 const scrim = $('#scrim');
 let openSheetId = null;
 function openSheet(id){
@@ -733,7 +600,6 @@ function closeSheet(){
 scrim.addEventListener('click', closeSheet);
 $$('[data-close]').forEach(b => b.addEventListener('click', closeSheet));
 
-/* toast */
 let toastTimer = null;
 function showToast(msg){
   const el = $('#toast');
@@ -743,72 +609,51 @@ function showToast(msg){
   toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-/* ====================================================================
-   8. EVENTS
-   ==================================================================== */
-/* --- navigazione pagine --- */
-$$('.nav button').forEach(btn => {
-  btn.onclick = () => {
-    $$('.nav button').forEach(b => b.classList.toggle('active', b === btn));
-    $$('.page').forEach(p => p.classList.remove('active'));
-    $('#page-' + btn.dataset.page).classList.add('active');
-    $('#scroll').scrollTop = 0;
-  };
-});
-
-$('#trustCta')?.addEventListener('click', () => {
-  $$('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === 'info'));
+/* ---------- 8. EVENTS ---------- */
+function gotoPage(page){
+  $$('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === page));
   $$('.page').forEach(p => p.classList.remove('active'));
-  $('#page-info').classList.add('active');
+  $('#page-' + page).classList.add('active');
   $('#scroll').scrollTop = 0;
-});
+}
+$$('.nav button').forEach(btn => btn.onclick = () => gotoPage(btn.dataset.page));
+$('#trustCta')?.addEventListener('click', () => gotoPage('info'));
 
-/* --- toggle lingua --- */
 $('#langToggle').onclick = () => {
   LANG = (LANG === 'it') ? 'en' : 'it';
   applyI18n();
   if (currentPlace && openSheetId === 'sheetInfo') openInfoWindow(currentPlace);
 };
 
-/* --- rail "+" -> form aggiungi posto --- */
-$('#railAdd').onclick = () => openSheet('sheetAdd');
-
-/* --- zoom --- */
-$('#zoomIn').onclick  = () => MapEngine.zoom(1);
-$('#zoomOut').onclick = () => MapEngine.zoom(-1);
-
-/* --- pin click --- */
+$('#railAdd').onclick   = () => openSheet('sheetAdd');
+$('#zoomIn').onclick    = () => MapEngine.zoom(1);
+$('#zoomOut').onclick   = () => MapEngine.zoom(-1);
 MapEngine.onPinClick(openInfoWindow);
 
-/* --- star rating nel form recensione --- */
+/* star rating */
 let rvRating = 0;
 function renderStars(){
   $('#rvStars').innerHTML = [1,2,3,4,5].map(n =>
     `<button data-n="${n}" class="${n<=rvRating?'on':''}">★</button>`).join('');
-  $$('#rvStars button').forEach(b => b.onclick = () => {
-    rvRating = +b.dataset.n; renderStars();
-  });
+  $$('#rvStars button').forEach(b => b.onclick = () => { rvRating = +b.dataset.n; renderStars(); });
 }
 renderStars();
 
-/* --- submit: aggiungi posto --- */
+/* submit: add place */
 $('#apSend').onclick = () => {
   const name = $('#apName').value.trim();
   const cat  = $('#apCat').value;
   const addr = $('#apAddr').value.trim();
   if (!name || !addr){ showToast(LANG==='it'?'Compila nome e indirizzo':'Fill in name and address'); return; }
-  // nuovo luogo (posizionato vicino al centro; un backend farebbe il geocoding)
-  const np = {
-    id: Date.now(), category:cat, name,
+  PLACES.push({
+    id: Date.now(), category: cat, name,
     lat: CONFIG.LECCO.lat + (Math.random()-.5)*0.012,
     lng: CONFIG.LECCO.lng + (Math.random()-.5)*0.018,
-    image:null,
-    description:{it:'Nuovo posto consigliato dalla community.',
-                 en:'New place recommended by the community.'},
-    address:addr, hours:{it:'Da confermare',en:'To be confirmed'},
-    addedAgo:0, rating:0, comments:[]
-  };
-  PLACES.push(np);
+    image: null,
+    description: {it:'Nuovo posto consigliato dalla community.', en:'New place recommended by the community.'},
+    address: addr, hours:{it:'Da confermare',en:'To be confirmed'},
+    addedAgo: 0, rating: 0, comments: []
+  });
   MapEngine.refresh();
   MapEngine.setFilter(FILTER);
   $('#apName').value = ''; $('#apAddr').value = '';
@@ -816,10 +661,10 @@ $('#apSend').onclick = () => {
   showToast(t('toast.added'));
 };
 
-/* --- submit: recensione --- */
+/* submit: review */
 $('#rvSend').onclick = () => {
-  const name = $('#rvName').value.trim() || (LANG==='it'?'Anonimo':'Anonymous');
-  const liked = $('#rvLiked').value.trim();
+  const name    = $('#rvName').value.trim() || (LANG==='it'?'Anonimo':'Anonymous');
+  const liked   = $('#rvLiked').value.trim();
   const improve = $('#rvImprove').value.trim();
   if (!liked && !improve){ showToast(LANG==='it'?'Scrivi una recensione':'Write a review'); return; }
   if (currentPlace){
@@ -834,30 +679,26 @@ $('#rvSend').onclick = () => {
   showToast(t('toast.review'));
 };
 
-/* --- submit: contatti --- */
+/* submit: contact */
 $('#ctSend').onclick = () => {
-  const name = $('#ctName').value.trim();
+  const name  = $('#ctName').value.trim();
   const email = $('#ctEmail').value.trim();
-  const msg = $('#ctMsg').value.trim();
+  const msg   = $('#ctMsg').value.trim();
   if (!name || !email || !msg){ showToast(LANG==='it'?'Compila tutti i campi':'Fill in all fields'); return; }
   $('#ctName').value=''; $('#ctEmail').value=''; $('#ctMsg').value='';
   showToast(t('toast.contact'));
 };
 
-/* ====================================================================
-   9. INIT
-   ==================================================================== */
-function init(){
+/* ---------- 9. INIT ---------- */
+(function init(){
   loadAssets();
-  applyI18n();          // -> renderRail + renderLegend + renderCatSelect
-  MapEngine.init();     // -> disegna mappa SVG + pin
+  applyI18n();
+  MapEngine.init();
   MapEngine.setFilter(FILTER);
 
-  // ricalcola posizione pin se la finestra cambia dimensione (ruota telefono, ecc.)
   let resizeTimer;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => MapEngine.refresh(), 200);
   });
-}
-init();
+})();
