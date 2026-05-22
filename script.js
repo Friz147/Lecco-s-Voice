@@ -143,10 +143,10 @@ let PLACES = [
     comments:[
       { author:'Jenny K.', ago:5,
         text:{
-          it:{ pos:'Molto vivace, ho trovato ogni tipo di prodotto locale. Freschissimo!',
-               neg:'I venditori non parlavano inglese, ma ci siamo capiti lo stesso.' },
-          en:{ pos:'Very bustling, I could find every kind of local product! So fresh!',
-               neg:'The vendors didn\'t speak English, but we found a way to be understood.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -162,10 +162,10 @@ let PLACES = [
     comments:[
       { author:'Luca R.', ago:10,
         text:{
-          it:{ pos:'Carne eccellente, si sente la qualità. Il salame di capra è unico.',
-               neg:'Prezzi un po\' alti rispetto alla media, ma la qualità giustifica.' },
-          en:{ pos:'Excellent meat, you can taste the quality. The goat salami is unique.',
-               neg:'Prices a bit higher than average, but quality justifies it.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -181,10 +181,10 @@ let PLACES = [
     comments:[
       { author:'Sara M.', ago:3,
         text:{
-          it:{ pos:'Vista stupenda e risotto con pesce persico perfetto. Atmosfera autentica.',
-               neg:'Attesa un po\' lunga nel weekend, meglio prenotare.' },
-          en:{ pos:'Stunning view and perfect perch risotto. Authentic atmosphere.',
-               neg:'Quite a wait on weekends, better to book ahead.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -200,10 +200,10 @@ let PLACES = [
     comments:[
       { author:'Giovanni P.', ago:7,
         text:{
-          it:{ pos:'Pesce freschissimo, il miglior lavarello che abbia mai mangiato.',
-               neg:'Orari di apertura limitati, bisogna andarci presto la mattina.' },
-          en:{ pos:'Incredibly fresh fish, the best whitefish I\'ve ever had.',
-               neg:'Limited opening hours, you need to go early in the morning.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -219,10 +219,10 @@ let PLACES = [
     comments:[
       { author:'Elena T.', ago:18,
         text:{
-          it:{ pos:'Il pane di segale è spettacolare, crosta croccante e mollica morbida.',
-               neg:'Pochi posti a sedere, è più un forno da asporto.' },
-          en:{ pos:'The rye bread is spectacular, crispy crust and soft crumb.',
-               neg:'Very few seats, it\'s more of a takeaway bakery.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -238,10 +238,10 @@ let PLACES = [
     comments:[
       { author:'Marco V.', ago:14,
         text:{
-          it:{ pos:'I biscotti di meliga sono incredibili, ricetta tradizionale perfetta.',
-               neg:'Chiude presto il pomeriggio, non sempre facile passarci.' },
-          en:{ pos:'The meliga biscuits are incredible, perfect traditional recipe.',
-               neg:'Closes early in the afternoon, not always easy to catch it.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -257,10 +257,10 @@ let PLACES = [
     comments:[
       { author:'Anna B.', ago:5,
         text:{
-          it:{ pos:'Verdure saporitissime, si vede che sono coltivate con cura. Prezzi onesti.',
-               neg:'Aperto solo due giorni a settimana, bisogna organizzarsi.' },
-          en:{ pos:'Very flavorful vegetables, you can tell they\'re grown with care. Fair prices.',
-               neg:'Only open two days a week, you need to plan ahead.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
@@ -276,10 +276,10 @@ let PLACES = [
     comments:[
       { author:'Anna B.', ago:5,
         text:{
-          it:{ pos:'Verdure saporitissime, si vede che sono coltivate con cura. Prezzi onesti.',
-               neg:'Aperto solo due giorni a settimana, bisogna organizzarsi.' },
-          en:{ pos:'Very flavorful vegetables, you can tell they\'re grown with care. Fair prices.',
-               neg:'Only open two days a week, you need to plan ahead.' }
+          it:{ pos:'',
+               neg:'' },
+          en:{ pos:'',
+               neg:'' }
         }
       }
     ]
