@@ -59,6 +59,8 @@ const I18N = {
     'rev.rating':'Valutazione',
     'rev.liked':'Cosa ti è piaciuto','rev.likedPh':'Il punto di forza del posto, la cosa che ti ha colpito positivamente...',
     'rev.improve':'Cosa miglioreresti','rev.improvePh':'Un consiglio costruttivo, qualcosa che potrebbe essere migliorato...',
+    'rev.owner':'Nota privata per il titolare (opzionale)','rev.ownerPh':'Solo il titolare potrà leggere questo messaggio...',
+    'rev.ownerNote':'Nota privata inviata al titolare',
     'rev.photo':'Foto (opzionale)','rev.photoCta':'Carica una foto del posto',
     'rev.send':'Pubblica la tua recensione',
     'iw.address':'Indirizzo','iw.hours':'Orari','iw.community':'Ricordi della community',
@@ -99,6 +101,8 @@ const I18N = {
     'rev.rating':'Rating',
     'rev.liked':'What you liked','rev.likedPh':'The strong point of the place, what struck you positively...',
     'rev.improve':'What you would improve','rev.improvePh':'A constructive tip, something that could be improved...',
+    'rev.owner':'Private note for the owner (optional)','rev.ownerPh':'Only the owner will be able to read this message...',
+    'rev.ownerNote':'Private note sent to the owner',
     'rev.photo':'Photo (optional)','rev.photoCta':'Upload a photo of the place',
     'rev.send':'Publish your review',
     'iw.address':'Address','iw.hours':'Hours','iw.community':'Community memories',
@@ -276,10 +280,10 @@ let PLACES = [
     comments:[
       { author:'Anna B.', ago:5,
         text:{
-          it:{ pos:'',
-               neg:'' },
-          en:{ pos:'',
-               neg:'' }
+          it:{ pos:'Miglior formaggi della zona, freschi e saporiti.',
+               neg:'Non aperto nel pomeriggio.' },
+          en:{ pos:'Best cheeses in the area, fresh and tasty.',
+               neg:'Not open in the afternoon' }
         }
       }
     ]
@@ -553,7 +557,10 @@ let currentPlace = null;
 function commentHTML(c){
   const ci  = c.author.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
   const txt = c.text[LANG];
-  return `<div class="comment"><div class="iw-av">${ci}</div><div class="c-body"><div class="c-head"><span class="c-name">${c.author}</span><span class="c-ago">${t('iw.daysAgo',{n:c.ago})}</span></div>${txt.pos ? `<p class="c-review c-pos"><span class="c-emoji">🙂</span> ${txt.pos}</p>` : ''}${txt.neg ? `<p class="c-review c-neg"><span class="c-emoji">😕</span> ${txt.neg}</p>` : ''}</div></div>`;
+  const ownerBadge = c.ownerNote
+    ? `<p class="c-owner-badge">${t('rev.ownerNote')}</p>`
+    : '';
+  return `<div class="comment"><div class="iw-av">${ci}</div><div class="c-body"><div class="c-head"><span class="c-name">${c.author}</span><span class="c-ago">${t('iw.daysAgo',{n:c.ago})}</span></div>${txt.pos ? `<p class="c-review c-pos"><span class="c-emoji">🙂</span> ${txt.pos}</p>` : ''}${txt.neg ? `<p class="c-review c-neg"><span class="c-emoji">😕</span> ${txt.neg}</p>` : ''}${ownerBadge}</div></div>`;
 }
 
 function openInfoWindow(place){
@@ -666,16 +673,19 @@ $('#rvSend').onclick = () => {
   const name    = $('#rvName').value.trim() || (LANG==='it'?'Anonimo':'Anonymous');
   const liked   = $('#rvLiked').value.trim();
   const improve = $('#rvImprove').value.trim();
+  const owner   = $('#rvOwner').value.trim();
   if (!liked && !improve){ showToast(LANG==='it'?'Scrivi una recensione':'Write a review'); return; }
   if (currentPlace){
     currentPlace.comments.push({
       author:name, ago:0,
-      text:{ it:{pos:liked,neg:improve}, en:{pos:liked,neg:improve} }
+      ownerNote: owner || null,  // stored but never shown in the public comment list
+      text:{ it:{pos:liked,neg:improve}, en:{pos:liked,neg:improve} },
+      
     });
     if (rvRating) currentPlace.rating += rvRating;
     openInfoWindow(currentPlace);
   }
-  $('#rvName').value=''; $('#rvLiked').value=''; $('#rvImprove').value=''; rvRating=0; renderStars();
+  $('#rvName').value=''; $('#rvLiked').value=''; $('#rvImprove').value=''; $('#rvOwner').value=''; rvRating=0; renderStars();
   showToast(t('toast.review'));
 };
 
