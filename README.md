@@ -1,4 +1,4 @@
-# Lecco's Voice 🗺️
+# Lecco's Voice 
 
 A mobile-first web app that maps local food producers, butchers, fishmongers, bakeries, and restaurants across the province of Lecco (Italy). Built as a university project for the **Sustainable Interaction Design Studio** course at Politecnico di Milano.
 
